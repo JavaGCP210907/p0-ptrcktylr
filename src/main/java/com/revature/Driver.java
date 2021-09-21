@@ -19,16 +19,8 @@ public class Driver {
 			}
 			
 			
-//			Menu menu = new Menu();
-//			menu.displayMenu();
-			
-			// testing login verification
-			Session currentUserSession = LoginDao.verifyUser("ptrcktylr", "my-cool-password");
-			if (currentUserSession != null) {
-				System.out.println("Current User ID is: " + currentUserSession.getUserId());
-			} else {
-				System.out.println("Try again!");
-			}
+			Menu menu = new Menu();
+			menu.displayMenu();
 			
 	}
 }
