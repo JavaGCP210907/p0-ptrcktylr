@@ -3,6 +3,7 @@ package com.revature;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import com.revature.dao.AddressDao;
 import com.revature.dao.LoginDao;
 import com.revature.models.Menu;
 import com.revature.models.Session;
@@ -17,7 +18,6 @@ public class Driver {
 				System.out.println("Connection failed..");
 				e.printStackTrace();
 			}
-			
 			
 			Menu menu = new Menu();
 			menu.displayMenu();

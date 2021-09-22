@@ -3,7 +3,9 @@ package com.revature.models;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import com.revature.dao.AddressDao;
 import com.revature.dao.LoginDao;
+import com.revature.dao.UserDao;
 
 public class Menu {
 	
@@ -68,8 +70,6 @@ public class Menu {
 						}
 						
 					}
-					 
-					
 					break;
 					
 				case "create account":
@@ -81,6 +81,88 @@ public class Menu {
 					}
 					
 					System.out.println("***create account***");
+					
+					// if email or username are already in the table keep asking
+					
+					
+					// add to logins table
+						// username (check if exists)
+					System.out.print("Please enter your desired username: ");
+					String username = sc.nextLine();
+					
+					// check if username available
+					while (!UserDao.isUsernameAvailable(username)) {
+						System.out.println("That username is taken. Please use another one.");
+						System.out.print("Please enter your desired username: ");
+						username = sc.nextLine();
+					}
+					
+						// password
+					System.out.print("Please enter a password: ");
+					String password = sc.nextLine();
+					
+					
+					// add to users table
+						// first name
+					System.out.print("Please enter your first name: ");
+					String first_name = sc.nextLine();
+						// last name
+					System.out.print("Please enter your last name: ");
+					String last_name = sc.nextLine();
+						// email (check if exists)
+					System.out.print("Please enter your email address: ");
+					String email = sc.nextLine();
+					
+					// check if email available
+					while (!UserDao.isEmailAvailable(email)) {
+						System.out.println("That email is taken. Please use another one.");
+						System.out.print("Please enter your desired email: ");
+						email = sc.nextLine();
+					}
+					
+					
+					// add to addresses table
+						// street address
+					System.out.print("Please enter your street number and address: ");
+					String street_address = sc.nextLine();
+						// city
+					System.out.print("Please enter your city: ");
+					String city = sc.nextLine();
+						// state
+					System.out.print("Please enter your state (ex: NY): ");
+					String state = sc.nextLine();
+					
+					while (state.length() != 2) {
+						System.out.println("Invalid state. Please use your state's two letter character abbreviation.");
+						System.out.print("Please enter your state (ex: NY): ");
+						state = sc.nextLine();
+					}
+					
+						// zip code
+					System.out.print("Please enter your zip code: ");
+					String zip_code = sc.nextLine();
+					
+					// create address record
+					Address address = new Address(street_address, city, state, zip_code);
+					AddressDao.addAddress(address);
+					
+					// get added address id so we can add it to new user
+					int newAddressId = AddressDao.getAddressId(street_address, city, state, zip_code);
+					
+					// create user record
+					User user = new User(first_name, last_name, email, newAddressId);
+					UserDao.addUser(user);
+					
+					// get user_id for login creation
+					int newUserId = UserDao.getUserId(email);
+					
+					// create login record
+					Login login = new Login(username, LoginDao.generateHash(password), newUserId);
+					LoginDao.addLogin(login);
+					
+					
+					System.out.println("User account successfully added!");
+					
 					break;
 				
 				case "quit":

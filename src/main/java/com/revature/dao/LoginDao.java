@@ -9,10 +9,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.hash.Hashing;
+import com.revature.models.Login;
 import com.revature.models.Session;
 import com.revature.utils.ConnectionUtil;
 
 public class LoginDao {
+	
+	public static void addLogin(Login login) {
+		try (Connection conn = ConnectionUtil.getConnection()) {
+			
+			String sql = "INSERT INTO logins (user_id, username, password_hash) "
+					   + "VALUES (?, ?, ?)";
+			
+			PreparedStatement ps = conn.prepareStatement(sql);
+			
+			ps.setInt(1, login.getUser_id());
+			ps.setString(2, login.getUsername());
+			ps.setString(3, login.getPassword_hash());
+			
+			ps.executeUpdate(); // for anything that is NOT a SELECT statement, we use executeUpdate()
+								
+		} catch (SQLException e) {
+			System.out.println("Failed to add Login!");
+			e.printStackTrace();
+		}
+	}
 	
 	// generate password hash using google hash function (no salt..)
 	public static String generateHash(String plaintext) {
