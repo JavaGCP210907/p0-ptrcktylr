@@ -30,14 +30,20 @@ public class Menu {
 			// choose options
 			System.out.println("\n*~~~~~~~~~~~~~~~~~~~~~~~CHOOSE AN OPTION:~~~~~~~~~~~~~~~~~~~~~~~*\n");
 			
-			if (currentUser == null) {
+			if (currentUser == null && !inAccountMenu) {
 				System.out.println("login -> Log into the application");
-				System.out.println("create account -> Create a new user account");
-			} else {
+				System.out.println("create user -> Create a new user account");
+			} else if (!inAccountMenu) {
 				System.out.println("summary -> See a summary of all your accounts");
 				System.out.println("accounts -> Go to bank accounts");
 				System.out.println("edit user -> Edit your information");
 				System.out.println("logout -> Log out of the application");
+			} else {
+				System.out.println("select -> Select a bank account");
+				System.out.println("create account -> Create a new bank account");
+				System.out.println("transfer funds -> Transfer funds to another account");
+				System.out.println("delete -> Delete a bank account");
+				System.out.println("back -> Go back to the User menu");
 			}
 
 			System.out.println("quit -> Quit the application \n");
@@ -51,6 +57,10 @@ public class Menu {
 					
 					if (currentUser != null) {
 						System.out.println("You're already logged in!");
+						break;
+					}
+					if (inAccountMenu == true) {
+						System.out.println("I'm sorry, that it's a valid menu option.");
 						break;
 					}
 					
@@ -77,7 +87,7 @@ public class Menu {
 					}
 					break;
 					
-				case "create account":
+				case "create user":
 					printSeperator();
 					
 					if (currentUser != null) {
@@ -170,6 +180,17 @@ public class Menu {
 					
 					break;
 				
+				case "back":
+					if (currentUser == null) {
+						System.out.println("You are not logged in!");
+						break;
+					} else if (inAccountMenu == false) {
+						System.out.println("You are not in the accounts menu!");
+						break;
+					}
+					inAccountMenu = false;
+					break;
+					
 				case "accounts":
 					// make a new account
 					// select account
@@ -177,9 +198,15 @@ public class Menu {
 						// transfer funds
 						// close current bank account
 					printSeperator();
+					if (inAccountMenu == true) {
+						System.out.println("I'm sorry, that it's a valid menu option.");
+						break;
+					}
 					if (currentUser == null) {
 						System.out.println("You are not logged in!");
 						break;
+					} else {
+						inAccountMenu = true;
 					}
 					System.out.println("Your Accounts: ");
 					break;
@@ -194,6 +221,10 @@ public class Menu {
 					for (Account acc : AccountDao.getAccounts(currentUser.getUserId())) {
 						System.out.println(acc);
 					}
+					if (inAccountMenu == true) {
+						System.out.println("I'm sorry, that it's a valid menu option.");
+						break;
+					}
 					break;
 				
 				case "edit user":
@@ -202,10 +233,14 @@ public class Menu {
 						System.out.println("You are not logged in!");
 						break;
 					}
+					if (inAccountMenu == true) {
+						System.out.println("I'm sorry, that it's a valid menu option.");
+						break;
+					}
 					System.out.println("What field would you like to edit?: ");
 					break;
 				
-				case "": // TODO: ACCOUNT MENU skfsdjkfhsdkfhsdk
+				case "select": // TODO: ACCOUNT MENU skfsdjkfhsdkfhsdk
 					break;
 					
 				case "quit":
@@ -219,6 +254,10 @@ public class Menu {
 					printSeperator();
 					if (currentUser == null) {
 						System.out.println("You are not logged in!");
+						break;
+					}
+					if (inAccountMenu == true) {
+						System.out.println("I'm sorry, that it's a valid menu option.");
 						break;
 					}
 					currentUser = null;
