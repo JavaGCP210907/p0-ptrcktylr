@@ -3,6 +3,7 @@ package com.revature.models;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import com.revature.dao.AccountDao;
 import com.revature.dao.AddressDao;
 import com.revature.dao.LoginDao;
 import com.revature.dao.UserDao;
@@ -14,6 +15,7 @@ public class Menu {
 	public void displayMenu() throws SQLException {
 		
 		boolean displayMenu = true;
+		boolean inAccountMenu = false;
 		Scanner sc = new Scanner(System.in);
 		
 		
@@ -32,6 +34,9 @@ public class Menu {
 				System.out.println("login -> Log into the application");
 				System.out.println("create account -> Create a new user account");
 			} else {
+				System.out.println("summary -> See a summary of all your accounts");
+				System.out.println("accounts -> Go to bank accounts");
+				System.out.println("edit user -> Edit your information");
 				System.out.println("logout -> Log out of the application");
 			}
 
@@ -165,6 +170,44 @@ public class Menu {
 					
 					break;
 				
+				case "accounts":
+					// make a new account
+					// select account
+						// see account transactions (if checking)
+						// transfer funds
+						// close current bank account
+					printSeperator();
+					if (currentUser == null) {
+						System.out.println("You are not logged in!");
+						break;
+					}
+					System.out.println("Your Accounts: ");
+					break;
+				
+				case "summary":
+					printSeperator();
+					if (currentUser == null) {
+						System.out.println("You are not logged in!");
+						break;
+					}
+					System.out.println("Your Accounts Summary: ");
+					for (Account acc : AccountDao.getAccounts(currentUser.getUserId())) {
+						System.out.println(acc);
+					}
+					break;
+				
+				case "edit user":
+					printSeperator();
+					if (currentUser == null) {
+						System.out.println("You are not logged in!");
+						break;
+					}
+					System.out.println("What field would you like to edit?: ");
+					break;
+				
+				case "": // TODO: ACCOUNT MENU skfsdjkfhsdkfhsdk
+					break;
+					
 				case "quit":
 					printSeperator();
 					System.out.println("Thank you for using our new and improved banking application!");

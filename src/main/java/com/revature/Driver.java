@@ -16,6 +16,8 @@ public class Driver {
 				e.printStackTrace();
 			}
 			
+			// TODO: ADD LOGGING!!!
+			
 			Menu menu = new Menu();
 			menu.displayMenu();
 			
