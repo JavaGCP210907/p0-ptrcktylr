@@ -44,7 +44,7 @@ public class Menu {
 				System.out.println("create user -> Create a new user account");
 			} else if (!inAccountMenu && !inAccountSelectionMenu) {
 				System.out.println("summary -> See a summary of all your accounts");
-				System.out.println("accounts -> Go to bank accounts");
+				System.out.println("accounts -> Go to bank accounts menu");
 				System.out.println("logout -> Log out of the application");
 			} else if (!inAccountSelectionMenu) {
 				System.out.println("select -> Select a bank account");
@@ -72,7 +72,7 @@ public class Menu {
 						break;
 					}
 					if (inAccountMenu == true) {
-						System.out.println("I'm sorry, that it's a valid menu option.");
+						System.out.println("I'm sorry, that isn't a valid menu option.");
 						break;
 					}
 					
@@ -205,7 +205,7 @@ public class Menu {
 				case "accounts":
 					printSeperator();
 					if (inAccountMenu == true) {
-						System.out.println("I'm sorry, that it's a valid menu option.");
+						System.out.println("I'm sorry, that isn't a valid menu option.");
 						break;
 					}
 					if (currentUser == null) {
@@ -258,7 +258,7 @@ public class Menu {
 						System.out.println(acc);
 					}
 					if (inAccountMenu == true) {
-						System.out.println("I'm sorry, that it's a valid menu option.");
+						System.out.println("I'm sorry, that isn't a valid menu option.");
 						break;
 					}
 					break;
@@ -279,13 +279,14 @@ public class Menu {
 					// user selects account, store that account id in currentBankAccount, set
 					// inAccountSelectionMenu = true
 					// print out users accounts
+					System.out.println("Your Accounts:");
 					List<Integer> validAccountIds = new ArrayList<Integer>();
 					for (Account acc : AccountDao.getAccounts(currentUser.getUserId())) {
 						System.out.println(acc);
 						validAccountIds.add(acc.getAccount_id());
 					}
-					
-					System.out.println("Select one of your accounts: ");
+					printSeperator();
+					System.out.print("Select one of your accounts: ");
 					String selectedAccountId = sc.nextLine();
 					
 					while (!validAccountIds.contains(Integer.parseInt(selectedAccountId))) {
@@ -433,9 +434,12 @@ public class Menu {
 						break;
 					}
 					if (inAccountMenu == true) {
-						System.out.println("I'm sorry, that it's a valid menu option.");
+						System.out.println("I'm sorry, that isn't a valid menu option.");
 						break;
 					}
+					
+					
+					log.info("USER: " + currentUser.getUserId() + " SUCCESSFULLY LOGGED OUT");
 					
 					// clear session details
 					currentUser = null;
@@ -444,11 +448,12 @@ public class Menu {
 					inAccountSelectionMenu = false;
 					
 					System.out.println("Successfully logged out!");
+					
 					break;
 					
 				default:
 					printSeperator();
-					System.out.println("I'm sorry, that it's a valid menu option.");
+					System.out.println("I'm sorry, that isn't a valid menu option.");
 					break;
 					
 			}

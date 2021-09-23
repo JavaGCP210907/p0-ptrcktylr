@@ -10,13 +10,12 @@ public class Driver {
 	public static void main(String[] args) throws SQLException {
 			
 			try(Connection conn = ConnectionUtil.getConnection()) {
-				// log successful connection
+				
 			} catch (SQLException e) {
 				System.out.println("Connection failed..");
 				e.printStackTrace();
 			}
 			
-			// TODO: ADD LOGGING!!!
 			
 			Menu menu = new Menu();
 			menu.displayMenu();

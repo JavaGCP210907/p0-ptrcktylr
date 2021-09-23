@@ -32,7 +32,9 @@ public class AccountDao {
 			ps.executeUpdate();
 			
 			System.out.println("Successfully created new bank account!");
-			// TODO: LOG USER_ID CREATED BANK ACCOUNT
+			log.info("USER: " + userId 
+					+ " CREATED A NEW "+ (accounttypeId == 1 ? "Checking" : "Savings") 
+					+" ACCOUNT");
 			
 		} catch (SQLException e) {
 			System.out.println("Failed to create new account!");
@@ -183,7 +185,6 @@ public class AccountDao {
 			ps.executeUpdate();
 			
 			System.out.println("Successfully added " + amount + " to your bank account!");
-			// TODO: log this
 			
 		} catch (SQLException e) {
 			System.out.println("Couldn't add funds to your account!");
