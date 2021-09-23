@@ -8,12 +8,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.hash.Hashing;
 import com.revature.models.Login;
+import com.revature.models.Menu;
 import com.revature.models.Session;
 import com.revature.utils.ConnectionUtil;
 
 public class LoginDao {
+	static Logger log = LogManager.getLogger(Menu.class);
 	
 	public static void addLogin(Login login) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
@@ -75,12 +80,14 @@ public class LoginDao {
 			// if there are 0 items in the list login failed 
 			if (memberIdList.size() == 0) {
 				System.out.println("Your username or password are incorrect.");
+				log.info("FAILED LOGIN WITH USERNAME: " + username);
 				return null;
 			}
 			
 			if (memberIdList.size() == 1) {
 				// log user in
 				System.out.println("Login successful!");
+				log.info("USER: " + username + " SUCCESSFULLY LOGGED IN");
 				return new Session(memberIdList.get(0));
 			}
 		}

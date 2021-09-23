@@ -124,9 +124,14 @@ public class Account {
 
 	@Override
 	public String toString() {
-		return "Account [account_id=" + account_id + ", date_opened=" + date_opened + ", date_closed=" + date_closed
-				+ ", is_open=" + is_open + ", accounttype_id=" + accounttype_id + ", user_id=" + user_id + ", balance="
-				+ balance + "]";
+		
+		return "Account Number: " + account_id 
+				+ " | Type: " + (accounttype_id == 1 ? "Checking" : "Savings") 
+				+ " Balance: $" + balance;
+		
+//		return "Account [account_id=" + account_id + ", date_opened=" + date_opened + ", date_closed=" + date_closed
+//				+ ", is_open=" + is_open + ", accounttype_id=" + accounttype_id + ", user_id=" + user_id + ", balance="
+//				+ balance + "]";
 	}
 	
 	

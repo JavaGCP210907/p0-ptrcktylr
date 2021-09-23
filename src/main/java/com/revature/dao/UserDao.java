@@ -11,7 +11,7 @@ import com.revature.models.User;
 import com.revature.utils.ConnectionUtil;
 
 public class UserDao {
-
+	
 	public static void addUser(User user) {
 		try (Connection conn = ConnectionUtil.getConnection()) {
 			

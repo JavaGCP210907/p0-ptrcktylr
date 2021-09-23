@@ -1,7 +1,12 @@
 package com.revature.models;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.revature.dao.AccountDao;
 import com.revature.dao.AddressDao;
@@ -11,12 +16,16 @@ import com.revature.dao.UserDao;
 public class Menu {
 	
 	private static Session currentUser;
+	private static int currentBankAccount = -1;
 	
 	public void displayMenu() throws SQLException {
 		
 		boolean displayMenu = true;
 		boolean inAccountMenu = false;
+		boolean inAccountSelectionMenu = false;
 		Scanner sc = new Scanner(System.in);
+		
+		Logger log = LogManager.getLogger(Menu.class);
 		
 		
 		// greeting
@@ -30,19 +39,23 @@ public class Menu {
 			// choose options
 			System.out.println("\n*~~~~~~~~~~~~~~~~~~~~~~~CHOOSE AN OPTION:~~~~~~~~~~~~~~~~~~~~~~~*\n");
 			
-			if (currentUser == null && !inAccountMenu) {
+			if (currentUser == null && !inAccountMenu && !inAccountSelectionMenu) {
 				System.out.println("login -> Log into the application");
 				System.out.println("create user -> Create a new user account");
-			} else if (!inAccountMenu) {
+			} else if (!inAccountMenu && !inAccountSelectionMenu) {
 				System.out.println("summary -> See a summary of all your accounts");
 				System.out.println("accounts -> Go to bank accounts");
 				System.out.println("edit user -> Edit your information");
 				System.out.println("logout -> Log out of the application");
-			} else {
+			} else if (!inAccountSelectionMenu) {
 				System.out.println("select -> Select a bank account");
 				System.out.println("create account -> Create a new bank account");
+				System.out.println("back -> Go back to the User menu");
+			} else {
+				System.out.println("balance -> See current bank account balance");
 				System.out.println("transfer funds -> Transfer funds to another account");
-				System.out.println("delete -> Delete a bank account");
+				System.out.println("add funds -> Add funds to bank account");
+				System.out.println("close account -> Close your selected bank account");
 				System.out.println("back -> Go back to the User menu");
 			}
 
@@ -81,7 +94,6 @@ public class Menu {
 						if (currentUserSession != null) {
 							valid = true;
 							currentUser = currentUserSession;
-							System.out.println("Thanks for logging in!");
 						}
 						
 					}
@@ -94,8 +106,6 @@ public class Menu {
 						System.out.println("You're already logged in!");
 						break;
 					}
-					
-					System.out.println("***create account***");
 					
 					// if email or username are already in the table keep asking
 					
@@ -177,6 +187,7 @@ public class Menu {
 					
 					
 					System.out.println("User account successfully added!");
+					log.info("ACCOUNT WITH USERNAME: " + username + " CREATED");
 					
 					break;
 				
@@ -189,14 +200,10 @@ public class Menu {
 						break;
 					}
 					inAccountMenu = false;
+					inAccountSelectionMenu = false;
 					break;
 					
 				case "accounts":
-					// make a new account
-					// select account
-						// see account transactions (if checking)
-						// transfer funds
-						// close current bank account
 					printSeperator();
 					if (inAccountMenu == true) {
 						System.out.println("I'm sorry, that it's a valid menu option.");
@@ -209,8 +216,38 @@ public class Menu {
 						inAccountMenu = true;
 					}
 					System.out.println("Your Accounts: ");
+					for (Account acc : AccountDao.getAccounts(currentUser.getUserId())) {
+						System.out.println(acc);
+					}
+					
 					break;
 				
+				case "create account":
+					printSeperator();
+					if (currentUser == null) {
+						System.out.println("You are not logged in!");
+						break;
+					}
+					System.out.println("What type of account would you like to create?");
+					System.out.println("1 : Checking Account");
+					System.out.println("2 : Savings Account");
+					
+					String accounttype_input = sc.nextLine();
+					
+					// validates account type input
+					while (!accounttype_input.equals("1") && !accounttype_input.equals("2")) {
+						System.out.println("Invalid account type for: " + accounttype_input);
+						System.out.println("Please select from the options below.");
+						System.out.println("1 : Checking Account");
+						System.out.println("2 : Savings Account");
+						
+						accounttype_input = sc.nextLine();
+					}
+					
+					AccountDao.addAccount(Integer.parseInt(accounttype_input), currentUser.getUserId());
+					
+					break;
+					
 				case "summary":
 					printSeperator();
 					if (currentUser == null) {
@@ -240,7 +277,160 @@ public class Menu {
 					System.out.println("What field would you like to edit?: ");
 					break;
 				
-				case "select": // TODO: ACCOUNT MENU skfsdjkfhsdkfhsdk
+				case "select":
+					printSeperator();
+					if (currentUser == null) {
+						System.out.println("You are not logged in!");
+						break;
+					}
+					
+					// if user has no accounts, leave
+					if (AccountDao.getAccounts(currentUser.getUserId()).isEmpty()) {
+						System.out.println("You have no accounts!");
+						break;
+					}
+					
+					// user selects account, store that account id in currentBankAccount, set
+					// inAccountSelectionMenu = true
+					// print out users accounts
+					List<Integer> validAccountIds = new ArrayList<Integer>();
+					for (Account acc : AccountDao.getAccounts(currentUser.getUserId())) {
+						System.out.println(acc);
+						validAccountIds.add(acc.getAccount_id());
+					}
+					
+					System.out.println("Select one of your accounts: ");
+					String selectedAccountId = sc.nextLine();
+					
+					while (!validAccountIds.contains(Integer.parseInt(selectedAccountId))) {
+						System.out.println("Invalid bank account number: " + selectedAccountId);
+						System.out.println("Select one of your accounts: ");
+						selectedAccountId = sc.nextLine();
+					}
+					
+					System.out.println("Selected bank account: " + selectedAccountId);
+					currentBankAccount = Integer.parseInt(selectedAccountId);
+					inAccountSelectionMenu = true;
+					
+					break;
+				
+					
+				case "add funds":
+					printSeperator();
+					// user not logged in
+					if (currentUser == null) {
+						System.out.println("You are not logged in!");
+						break;
+					}
+					// user hasn't selected an account
+					if (currentBankAccount == -1 || !inAccountSelectionMenu) {
+						System.out.println("You haven't selected an account!");
+						break;
+					}
+					
+					System.out.print("How much would you like to add to your account?: ");
+					double amountToAdd = sc.nextDouble();
+					sc.nextLine();
+					
+					AccountDao.addFunds(currentBankAccount, amountToAdd);
+					// print current balance
+					System.out.println("Your current balance is now: $" 
+					+ AccountDao.getAccountBalance(currentBankAccount, currentUser.getUserId()));
+					
+					break;
+				
+				case "balance":
+					printSeperator();
+					// user not logged in
+					if (currentUser == null) {
+						System.out.println("You are not logged in!");
+						break;
+					}
+					// user hasn't selected an account
+					if (currentBankAccount == -1 || !inAccountSelectionMenu) {
+						System.out.println("You haven't selected an account!");
+						break;
+					}
+					
+					System.out.println("Your current balance for account " + currentBankAccount + " is: $"
+							+ AccountDao.getAccountBalance(currentBankAccount, currentUser.getUserId()));
+					
+					break;
+					
+				case "transfer funds":
+					
+					// how much would you like to transfer
+					System.out.print("How much would you like to transfer?: ");
+					double amountToTransfer = sc.nextDouble();
+					sc.nextLine();
+					
+					// check this account has enough
+					while (amountToTransfer > AccountDao.getAccountBalance(currentBankAccount, currentUser.getUserId()) || amountToTransfer <= 0 ) {
+						System.out.println("You don't have enough money!");
+						System.out.println("Your current balance is: $" 
+						+ AccountDao.getAccountBalance(currentBankAccount, currentUser.getUserId()));
+						
+						System.out.print("How much would you like to transfer?: ");
+						amountToTransfer = sc.nextDouble();
+						sc.nextLine();
+					}
+					
+					// what account would you like to transfer to
+					System.out.print("To what account would you like to transfer this to?: ");
+					int accountToTransferTo = sc.nextInt();
+					sc.nextLine();
+					
+					//
+					while ((!AccountDao.getAllBankAccountIds().contains(accountToTransferTo)) || 
+							(currentBankAccount == accountToTransferTo)) {
+						System.out.println("This isn't a valid New Horizon Financial bank account!");
+						System.out.println("You can send to any bank account number except your current account: " 
+						+ currentBankAccount);
+						
+						System.out.print("To what account would you like to transfer this to?: ");
+						accountToTransferTo = sc.nextInt();
+						sc.nextLine();
+					}
+					
+					System.out.println("Sending $" + amountToTransfer + " to account number: " + accountToTransferTo);
+					System.out.print("Confirm transfer (Y/N): ");
+					
+					String response = sc.nextLine();
+					if (response.toLowerCase().equals("y")) {
+						AccountDao.transferFunds(currentBankAccount, accountToTransferTo, amountToTransfer);
+						// TODO: LOG THIS!!!
+					} else {
+						System.out.println("Cancelling transfer!");
+						break;
+					}
+					
+					
+					// current account balance
+					System.out.println("Your current balance is now: $" 
+					+ AccountDao.getAccountBalance(currentBankAccount, currentUser.getUserId()));
+					
+					break;
+					
+				case "close account":
+					
+					// close selected bank account
+					System.out.println("Are you sure?");
+					System.out.println("By closing your account you forfeit all remaining $"
+							+ AccountDao.getAccountBalance(currentBankAccount, currentUser.getUserId()) 
+							+ " to New Horizon Financial!");
+					
+					System.out.print("Confirm bank account closure (Y/N): ");
+					String closeResponse = sc.nextLine();
+					if (closeResponse.toLowerCase().equals("y")) {
+						AccountDao.closeAccount(currentBankAccount, currentUser.getUserId());
+					} else {
+						System.out.println("Cancelling bank account closure!");
+						break;
+					}
+					
+					// session cleanup
+					currentBankAccount = -1;
+					inAccountSelectionMenu = false;
 					break;
 					
 				case "quit":
@@ -260,7 +450,13 @@ public class Menu {
 						System.out.println("I'm sorry, that it's a valid menu option.");
 						break;
 					}
+					
+					// clear session details
 					currentUser = null;
+					currentBankAccount = -1;
+					inAccountMenu = false;
+					inAccountSelectionMenu = false;
+					
 					System.out.println("Successfully logged out!");
 					break;
 					
