@@ -45,7 +45,6 @@ public class Menu {
 			} else if (!inAccountMenu && !inAccountSelectionMenu) {
 				System.out.println("summary -> See a summary of all your accounts");
 				System.out.println("accounts -> Go to bank accounts");
-				System.out.println("edit user -> Edit your information");
 				System.out.println("logout -> Log out of the application");
 			} else if (!inAccountSelectionMenu) {
 				System.out.println("select -> Select a bank account");
@@ -262,19 +261,6 @@ public class Menu {
 						System.out.println("I'm sorry, that it's a valid menu option.");
 						break;
 					}
-					break;
-				
-				case "edit user":
-					printSeperator();
-					if (currentUser == null) {
-						System.out.println("You are not logged in!");
-						break;
-					}
-					if (inAccountMenu == true) {
-						System.out.println("I'm sorry, that it's a valid menu option.");
-						break;
-					}
-					System.out.println("What field would you like to edit?: ");
 					break;
 				
 				case "select":
